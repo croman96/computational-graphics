@@ -1,2 +1,2 @@
-# Computational Graphics
-Code generated for the Computational Graphics class (AD18)
+# Computer Graphics
+Code generated for the Computer Graphics class (AD18)
