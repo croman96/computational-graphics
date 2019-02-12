@@ -1,30 +1,27 @@
 /**********************************************************************
  *  README.txt
- *  TC3022 - Spinning Rubber Ball
+ *  TC3022- Spinning Rubber Ball
  **********************************************************************/
 
 /**********************************************************************
 * What is your name?
 ***********************************************************************/
 
-<Replace this with your response--remember to delete the angle brackets>
-
-
+Carlos Román Rivera - A01700820
 
 /**********************************************************************
 * What browser and operating system did you test your program with?
 ***********************************************************************/
 
-<Replace this with your response>
+Google Chrome - MacOS
 
+Safari - MacOS
 
 /**********************************************************************
 * Approximately how many hours did you spend working on this assignment?
 ***********************************************************************/
 
-<Replace this with your response!>
-
-
+1 hour.
 
 /**********************************************************************
  * Describe any problems you encountered in this assignment.
@@ -32,9 +29,8 @@
  * How can I make this assignment better?
  **********************************************************************/
 
-<Replace this with your response!>
-
-
+The complexity of this homework was the same of the previous one. Not easy,
+but solvable.
 
 /**********************************************************************
  * List any other comments (about the assignment or your submission)
@@ -42,4 +38,4 @@
  * doing the assignment, whether you enjoyed doing it, etc.
  **********************************************************************/
 
-<Replace this with your response!>
+It is fun to continue learning this kind of tools and libraries.
