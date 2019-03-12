@@ -421,7 +421,38 @@ function animate() {
     rightLowerClaw.rotation.z = (-70 * Math.PI / 180) - (params.grab * Math.PI / 180);
     leftUpperClaw.rotation.z = (-70 * Math.PI / 180) - (params.grab * Math.PI / 180);
     leftLowerClaw.rotation.z = (-70 * Math.PI / 180) - (params.grab * Math.PI / 180);
-    
+
+    keyBoard.update();
+
+    var moveSpeed = 5;
+    var eyeSpeed = 0.1;
+
+    var rotateSpeed = 2.5;
+    rotateSpeed *= Math.PI / 180;
+
+    var forward = new THREE.Vector3(1, 0, 0);
+    forward.applyQuaternion(innerGroup.quaternion).normalize();
+
+    if (keyBoard.pressed("W")) {
+        outerGroup.translateOnAxis(forward, moveSpeed);
+    }
+
+    if (keyBoard.pressed("S")) {
+        outerGroup.translateOnAxis(forward.multiplyScalar(-1), moveSpeed);
+    }
+
+    if (keyBoard.pressed("A")) {
+        outerGroup.rotateY(rotateSpeed);
+    }
+
+    if (keyBoard.pressed("D")) {
+        outerGroup.rotateY(-rotateSpeed);
+    }
+
+    if (keyBoard.pressed("W") || keyBoard.pressed("A") || keyBoard.pressed("S") || keyBoard.pressed("D")) {
+        moveLegs();
+    }
+
     window.requestAnimationFrame(animate);
     render();
 }
