@@ -1,0 +1,34 @@
+{
+	"camera" : {
+		"eye" : [2.0, 1.0, -1.0],
+		"up" : [0.0, 0.0, 0.0],
+		"at" : [0.0, 0.0, -1.0],
+		"fovy" : 45, "aspect" : 1
+	},
+	"bounce_depth" : 0,
+	"shadow_bias" : 0.0001,
+
+	"lights" : [
+		{"source" : "Ambient", "color" : [0.089,0.089,0.089]},
+		{"source" : "Point", "position" : [2, 1, 1], "color" : [1,1,1]}
+	],
+
+	"materials" : [
+		{
+			"ka" : [0,1,0],
+			"kd" : [0,1,0],
+			"ks" : [1,1,1],
+			"shininess" : 40,
+			"kr" : [0,0,0]
+		}
+	],
+
+	"surfaces" : [
+		{
+			"shape" : "Sphere",
+			"center" : [0,0,-1],
+			"radius" : 0.25,
+			"material" : 0
+		}
+	]
+}

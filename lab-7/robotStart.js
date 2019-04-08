@@ -3,161 +3,119 @@ var cameraControls;
 var clock = new THREE.Clock();
 var keyBoard = new KeyboardState();
 
-function fillScene() {
-    scene = new THREE.Scene();
-    scene.background = new THREE.CubeTextureLoader()
-        .setPath('../../images/airport/')
-        .load([
-            'sky-xpos.png',
-            'sky-xneg.png',
-            'sky-ypos.png',
-            'sky-yneg.png',
-            'sky-zpos.png',
-            'sky-zneg.png'
-        ]);
-    scene.fog = new THREE.Fog(0x808080, 2000, 4000);
-    scene.add(new THREE.AmbientLight(0x222222));
-    light = new THREE.DirectionalLight(0xffffff, 0.7);
-    light.position.set(200, 500, 500);
-    scene.add(light);
-    light = new THREE.DirectionalLight(0xffffff, 0.9);
-    light.position.set(-200, -100, -400);
-    scene.add(light);
-    gridXZ = new THREE.GridHelper(2000, 100, new THREE.Color(0xCCCCCC), new THREE.Color(0x888888));
-    scene.add(gridXZ);
-    axes = new THREE.AxisHelper(150);
-    axes.position.y = 1;
-    scene.add(axes);
-    drawRobot();
-}
+var swivel = 0;
+var bend = 0;
+var grab = 0;
 
-function createGUI() {
-    gui = new dat.GUI({
-        autoPlace: false
-    });
-    params = {
-        swivel: 0,
-        bend: 0,
-        grab: 0
-    };
-    gui.add(params, 'swivel').min(-180).max(180).step(10).name('Swivel');
-    gui.add(params, 'bend').min(-90).max(90).step(5).name('Bend');
-    gui.add(params, 'grab').min(0).max(30).step(1).name('Grab');
-    gui.domElement.style.position = "relative";
-    gui.domElement.style.top = "-400px";
-    gui.domElement.style.left = "350px";
+function fillScene() {
+  scene = new THREE.Scene();
+  scene.add(new THREE.AmbientLight(0x222222));
+  light = new THREE.DirectionalLight(0xffffff, 0.7);
+  light.position.set(200, 500, 500);
+  scene.add(light);
+  light = new THREE.DirectionalLight(0xffffff, 0.9);
+  light.position.set(-200, -100, -400);
+  scene.add(light);
+  gridXZ = new THREE.GridHelper(2000, 100, new THREE.Color(0xCCCCCC), new THREE.Color(0x888888));
+  scene.add(gridXZ);
+  axes = new THREE.AxisHelper(150);
+  axes.position.y = 1;
+  scene.add(axes);
+  drawRobot();
 }
 
 function drawRobot() {
 
-	//////////////////////////////
-	// MATERIALS
-	// Basic Material
 	var basicMaterial = new THREE.MeshPhongMaterial({
-			side: THREE.DoubleSide,
-			color: 0x000000,
-			emissive: 0x000000,
-			emissiveIntensity: 5,
-			emissiveMap: scene.background,
-			envMap: scene.background,
-			wireframe: false
+		side: THREE.DoubleSide,
+		color: 0x000000,
+		wireframe: false
 	});
 
-	// Metal Material
-	var metalMaterial = new THREE.MeshPhongMaterial({
-			side: THREE.DoubleSide,
-			color: 0x000000
-	});
-
-	// Matte Material
 	var matteMaterial = new THREE.MeshLambertMaterial({
-			side: THREE.DoubleSide,
-			color: 0xffffff
+		side: THREE.DoubleSide,
+		color: 0xffffff
 	});
 
-	// Glass Material
-	var glassMaterial = new THREE.MeshPhongMaterial({
-			color: 0x000000,
-			shininess: 100,
-			transparent: true,
-			opacity: 0.4,
-			envMap: scene.background,
-			combine: THREE.MixOperation,
-			reflectivity: 0.8
-	})
+  var cruzAzul = new THREE.MeshLambertMaterial({
+		side: THREE.DoubleSide,
+		color: 0x0000ff
+	});
 
-	var pupilMaterial = new THREE.MeshPhongMaterial({
-			color: 0xffffff,
-			shininess: 100,
-			transparent: false,
-			envMap: scene.background,
-			combine: THREE.MixOperation,
-			reflectivity: 0.8
-	})
+  var tenis = new THREE.MeshLambertMaterial({
+		side: THREE.DoubleSide,
+		color: 0xff0000
+	});
 
-  var options = {
-		amount: 10,
-		bevelThickness: 2,
-		bevelSize: 1,
-		bevelSegments: 3,
-		bevelEnabled: true,
-		curveSegments: 12,
-		steps: 1,
-		material: eyeMaterial
-	};
-
-	var cylinder;
+	var trunk;
 	var leg;
 
-	// MODELS
+	trunk = new THREE.Mesh(new THREE.BoxGeometry(75, 150, 100), cruzAzul);
+	trunk.position.x = 0;
+	trunk.position.y = 225;
+	trunk.position.z = 0;
+	scene.add( trunk );
 
- //body
-	cylinder = new THREE.Mesh(
-		new THREE.CylinderGeometry( 45, 45, 150, 32 ), metalMaterial );
-	cylinder.position.x = 0;
-	cylinder.position.y = 225;
-	cylinder.position.z = 0;
-	scene.add( cylinder );
-
-	// legs
 	var upperleg, lowerleg, upperlegGeometry, lowerlegGeometry, legMaterial;
-	upperlegGeometry = new THREE.CylinderGeometry(15, 12, 100, 16, 16);
-	lowerlegGeometry = new THREE.CylinderGeometry(12, 5, 100, 16, 16);
-	legMaterial = matteMaterial;
-	upperleg = new THREE.Mesh(upperlegGeometry, legMaterial);
-	lowerleg = new THREE.Mesh(lowerlegGeometry, legMaterial);
-	var upperleftLeg, upperrightLeg, lowerleftLeg, lowerrightLeg;
-	upperleftLeg = upperleg.clone();
+
+  upperlegGeometry = new THREE.CylinderGeometry(12, 12, 100, 16, 16);
+	lowerlegGeometry = new THREE.CylinderGeometry(12, 12, 100, 16, 16);
+
+  legMaterial = matteMaterial;
+
+  upperleg = new THREE.Mesh(upperlegGeometry, legMaterial);
+	lowerleg = new THREE.Mesh(lowerlegGeometry, cruzAzul);
+
+  var upperleftLeg, upperrightLeg, lowerleftLeg, lowerrightLeg, leftKnee, rightKnee;
+
+  upperleftLeg = upperleg.clone();
 	upperrightLeg = upperleg.clone();
 	lowerleftLeg = lowerleg.clone();
 	lowerrightLeg = lowerleg.clone();
+
   upperleftLeg.position.x = 0;
 	upperleftLeg.position.y = -50;
 	upperleftLeg.position.z = 0;
 	scene.add(upperleftLeg);
+
   upperrightLeg.position.x = 0;
 	upperrightLeg.position.y = -50;
 	upperrightLeg.position.z = 0;
 	scene.add(upperrightLeg);
+
+  leftKnee = new THREE.Mesh(new THREE.SphereGeometry(17, 17, 17), matteMaterial);
+	leftKnee.position.x = 0;
+	leftKnee.position.y = -100;
+	leftKnee.position.z = 0;
+	scene.add(leftKnee);
+
+  rightKnee = new THREE.Mesh(new THREE.SphereGeometry(17, 17, 17), matteMaterial);
+	rightKnee.position.x = 0;
+	rightKnee.position.y = -100;
+	rightKnee.position.z = 0;
+	scene.add(rightKnee);
+
   lowerleftLeg.position.x = 0;
 	lowerleftLeg.position.y = -150;
 	lowerleftLeg.position.z = 0;
 	scene.add(lowerleftLeg);
+
   lowerleftLeg.position.x = 0;
 	lowerrightLeg.position.y = -150;
 	lowerrightLeg.position.z = 0;
 	scene.add(lowerrightLeg);
 
-	// The feet
 	var footLength = 40;
 	var footWidth = 20;
 	var footShape = new THREE.Shape();
-	footShape.moveTo(0, 0);
+
+  footShape.moveTo(0, 0);
 	footShape.lineTo(0, footWidth);
 	footShape.lineTo(footLength, footWidth);
 	footShape.lineTo(footLength, 0);
 	footShape.lineTo(0, 0);
-	var extrudeSettings = {
+
+  var extrudeSettings = {
 			steps: 2,
 			amount: 10,
 			bevelEnabled: true,
@@ -165,22 +123,25 @@ function drawRobot() {
 			bevelSize: 5,
 			bevelSegments: 1
 	};
+
 	var geometry = new THREE.ExtrudeGeometry(footShape, extrudeSettings);
-	var material = metalMaterial;
-	var foot = new THREE.Mesh(geometry, material);
+	var material = tenis;
+
+  var foot = new THREE.Mesh(geometry, material);
 	foot.rotateX(Math.PI / 2);
-	var leftFoot = foot.clone();
-	leftFoot.position.x = 0;
+
+  var leftFoot = foot.clone();
+	leftFoot.position.x = -10;
 	leftFoot.position.y = -200;
-	leftFoot.position.z = 0;
-	var rightFoot = foot.clone();
-	rightFoot.position.x = 0;
+	leftFoot.position.z = -10;
+
+  var rightFoot = foot.clone();
+	rightFoot.position.x = -10;
 	rightFoot.position.y = -200;
-	rightFoot.position.z = 0;
+	rightFoot.position.z = -10;
 	scene.add(leftFoot);
 	scene.add(rightFoot);
 
-	// The neck
 	var neckCylinder, neckCylinderGeometry, neckCylinderMaterial;
 	neckCylinderGeometry = new THREE.CylinderGeometry(15, 15, 25, 16, 16);
 	neckCylinderMaterial = matteMaterial;
@@ -190,9 +151,8 @@ function drawRobot() {
 	neckCylinder.position.z = 0;
 	scene.add(neckCylinder);
 
-	//Head
 	var headBox, headBoxGeometry, headBoxMaterial;
-	headBoxGeometry = new THREE.BoxGeometry(60, 60, 60);
+	headBoxGeometry = new THREE.SphereGeometry(50, 260, 260);
 	headBoxMaterial = matteMaterial;
 	headBox = new THREE.Mesh(headBoxGeometry, headBoxMaterial);
 	headBox.position.x = 0;
@@ -200,62 +160,33 @@ function drawRobot() {
 	headBox.position.z = 0;
 	scene.add(headBox);
 
-	//eyes
-	var eye, eyeGeometry, eyeMaterial;
-	eyeGeometry = new THREE.SphereGeometry(8, 16, 16);
-	eyeMaterial = glassMaterial;
-	eye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-	var leftEye, rightEye;
-	leftEye = eye.clone();
-	rightEye = eye.clone();
-	leftEye.position.x = 30;
-	leftEye.position.y = 10;
-	leftEye.position.z = -15;
-	rightEye.position.x = 30;
-	rightEye.position.y = 10;
-	rightEye.position.z = 15;
-	scene.add(leftEye);
-	scene.add(rightEye);
-
-	leftArmConnector = new THREE.Mesh(new THREE.TorusGeometry(15,10,10,10,2 * Math.PI),matteMaterial);
-	leftArmConnector.position.x = 0;
-	leftArmConnector.position.y = 265;
-	leftArmConnector.position.z = -45;
-	scene.add(leftArmConnector);
-
-	rightArmConnector = new THREE.Mesh(new THREE.TorusGeometry(15,10,10,10,2 * Math.PI),matteMaterial);
-	rightArmConnector.position.x = 0;
-	rightArmConnector.position.y = 265;
-	rightArmConnector.position.z = 45;
-	scene.add(rightArmConnector);
-
-	rightShoulder = new THREE.Mesh(new THREE.CylinderGeometry(15,15,30,20,1,false),matteMaterial);
+	rightShoulder = new THREE.Mesh(new THREE.CylinderGeometry(15,15,30,20,1,false), cruzAzul);
 	rightShoulder.position.x = 0;
-	rightShoulder.position.y = 265;
+	rightShoulder.position.y = -35;
 	rightShoulder.position.z = 0;
 	scene.add(rightShoulder);
 
-	leftShoulder = new THREE.Mesh(new THREE.CylinderGeometry(15,15,30,20,1,false),matteMaterial);
+	leftShoulder = new THREE.Mesh(new THREE.CylinderGeometry(15,15,30,20,1,false), cruzAzul);
 	leftShoulder.position.x = 0;
-	leftShoulder.position.y = 265;
+	leftShoulder.position.y = -35;
 	leftShoulder.position.z = 0;
 	scene.add(leftShoulder);
 
-	rightHumerus = new THREE.Mesh(new THREE.CylinderGeometry(10,10,80,20,1,false),metalMaterial);
+	rightHumerus = new THREE.Mesh(new THREE.CylinderGeometry(10,10,80,20,1,false), matteMaterial);
 	rightHumerus.position.x = 0;
-	rightHumerus.position.y = 230;
+	rightHumerus.position.y = -70;
 	rightHumerus.position.z = 0;
 	scene.add(rightHumerus);
 
-	leftHumerus = new THREE.Mesh(new THREE.CylinderGeometry(10,10,80,20,1,false),metalMaterial);
+	leftHumerus = new THREE.Mesh(new THREE.CylinderGeometry(10,10,80,20,1,false), matteMaterial);
 	leftHumerus.position.x = 0;
-	leftHumerus.position.y = 230;
+	leftHumerus.position.y = -70;
 	leftHumerus.position.z = 0;
 	scene.add(leftHumerus);
 
 	leftElbow = new THREE.Mesh(new THREE.CylinderGeometry(15,15,15,15,1,false),matteMaterial);
 	leftElbow.position.x = 0;
-	leftElbow.position.y = 0;
+	leftElbow.position.y = -300;
 	leftElbow.position.z = 0;
 	leftElbow.rotation.y = Math.PI/2;
 	leftElbow.rotation.z = Math.PI/2;
@@ -263,164 +194,107 @@ function drawRobot() {
 
 	rightElbow = new THREE.Mesh(new THREE.CylinderGeometry(15,15,15,15,1,false),matteMaterial);
 	rightElbow.position.x = 0;
-	rightElbow.position.y = 0;
+	rightElbow.position.y = -300;
 	rightElbow.position.z = 0;
 	rightElbow.rotation.y = Math.PI/2;
 	rightElbow.rotation.z = Math.PI/2;
 	scene.add(rightElbow);
 
-	rightForarm = new THREE.Mesh(new THREE.CylinderGeometry(10,7,40,20,1,false),metalMaterial);
+	rightForarm = new THREE.Mesh(new THREE.CylinderGeometry(10,10,40,20,1,false),matteMaterial);
 	rightForarm.position.x = 0;
-	rightForarm.position.y = -30;
+	rightForarm.position.y = -330;
 	rightForarm.position.z = 0;
 	scene.add(rightForarm);
 
-	leftForarm = new THREE.Mesh(new THREE.CylinderGeometry(10,7,40,20,1,false),metalMaterial);
+	leftForarm = new THREE.Mesh(new THREE.CylinderGeometry(10,10,40,20,1,false),matteMaterial);
 	leftForarm.position.x = 0;
-	leftForarm.position.y = -30;
+	leftForarm.position.y = -330;
 	leftForarm.position.z = 0;
 	scene.add(leftForarm);
 
-	rightWrist = new THREE.Mesh(new THREE.CylinderGeometry(10,10,10,10,1,false),matteMaterial);
+  rightWrist = new THREE.Mesh(new THREE.CylinderGeometry(12,12,20,20,1,false),matteMaterial);
 	rightWrist.position.x = 0;
-	rightWrist.position.y = 175;
+	rightWrist.position.y = -360;
 	rightWrist.position.z = 0;
 	rightWrist.rotation.y = Math.PI/2;
 	rightWrist.rotation.z = Math.PI/2;
 	scene.add(rightWrist);
 
-	leftWrist = new THREE.Mesh(new THREE.CylinderGeometry(10,10,10,10,1,false),matteMaterial);
+	leftWrist = new THREE.Mesh(new THREE.CylinderGeometry(12,12,20,20,1,false),matteMaterial);
 	leftWrist.position.x = 0;
-	leftWrist.position.y = -70;
+	leftWrist.position.y = -360;
 	leftWrist.position.z = 0;
 	leftWrist.rotation.y = Math.PI/2;
 	leftWrist.rotation.z = Math.PI/2;
 	scene.add(leftWrist);
 
-  rightUpperClaw = new THREE.Mesh(new THREE.ExtrudeGeometry(drawClaw(),options));
-  rightUpperClaw.position.x = 5;
-  rightUpperClaw.position.y = 170;
-  rightUpperClaw.position.z = 0;
-  rightUpperClaw.rotation.y = Math.PI;
-  rightUpperClaw.rotation.z = Math.PI * 1.5;
-  rightUpperClaw.material = pupilMaterial;
-  scene.add(rightUpperClaw);
-
-  leftUpperClaw = new THREE.Mesh(new THREE.ExtrudeGeometry(drawClaw(),options));
-  leftUpperClaw.position.x = -5;
-  leftUpperClaw.position.y = -60;
-  leftUpperClaw.position.z = 0;
-  leftUpperClaw.rotation.y = Math.PI;
-  leftUpperClaw.rotation.z = Math.PI * 1.5;
-  leftUpperClaw.material = pupilMaterial;
-  scene.add(leftUpperClaw);
-
-
-  rightLowerClaw = new THREE.Mesh(new THREE.ExtrudeGeometry(drawClaw(),options));
-  rightLowerClaw.position.x = 5;
-  rightLowerClaw.position.y = 170;
-  rightLowerClaw.position.z = 0;
-  rightLowerClaw.rotation.z = Math.PI * 1.5;
-  rightLowerClaw.material = pupilMaterial;
-  scene.add(rightLowerClaw);
-
-  leftLowerClaw = new THREE.Mesh(new THREE.ExtrudeGeometry(drawClaw(),options));
-  leftLowerClaw.position.x = -5;
-  leftLowerClaw.position.y = -60;
-  leftLowerClaw.position.z = 0;
-  leftLowerClaw.rotation.z = Math.PI * 1.5;
-  leftLowerClaw.material = pupilMaterial;
-  scene.add( leftLowerClaw );
-
-leftRobotClaw = new THREE.Group()
-    .add(leftLowerClaw)
-    .add(leftUpperClaw)
+  leftRobotForearm = new THREE.Group()
+    .add(leftForarm)
+    .add(leftElbow)
     .add(leftWrist);
-rightRobotClaw = new THREE.Group()
-    .add(rightLowerClaw)
-    .add(rightUpperClaw)
+
+  rightRobotForearm = new THREE.Group()
+    .add(rightForarm)
+    .add(rightElbow)
     .add(rightWrist);
 
-leftRobotForearm = new THREE.Group()
-    .add(leftRobotClaw)
-    .add(leftForarm)
-    .add(leftElbow);
-rightRobotForearm = new THREE.Group()
-    .add(rightRobotClaw)
-    .add(rightForarm)
-    .add(rightElbow);
-leftRobotArm = new THREE.Group()
+  leftRobotArm = new THREE.Group()
     .add(leftRobotForearm)
     .add(leftHumerus)
     .add(leftShoulder);
-rightRobotArm = new THREE.Group()
+
+  rightRobotArm = new THREE.Group()
     .add(rightRobotForearm)
     .add(rightHumerus)
     .add(rightShoulder);
 
-robotEyes = new THREE.Group()
-    .add(leftEye)
-    .add(rightEye)
-robotHead = new THREE.Group()
+  robotHead = new THREE.Group()
     .add(headBox)
-    .add(robotEyes);
-robotBody = new THREE.Group()
-    .add(neckCylinder)
-    .add(cylinder)
-    .add(leftArmConnector)
-    .add(rightArmConnector);
 
-robotLeftLeg = new THREE.Group()
+  robotBody = new THREE.Group()
+    .add(neckCylinder)
+    .add(trunk);
+
+  robotLeftLeg = new THREE.Group()
     .add(upperleftLeg)
+    .add(leftKnee)
     .add(lowerleftLeg)
     .add(leftFoot);
-robotRightLeg = new THREE.Group()
+
+  robotRightLeg = new THREE.Group()
     .add(upperrightLeg)
+    .add(rightKnee)
     .add(lowerrightLeg)
     .add(rightFoot);
 
-robot = new THREE.Group()
-  .add(robotHead)
-  .add(robotBody)
-  .add(robotLeftLeg)
-  .add(robotRightLeg)
-  .add(leftRobotArm)
-  .add(rightRobotArm);
+  robot = new THREE.Group()
+    .add(robotHead)
+    .add(robotBody)
+    .add(robotLeftLeg)
+    .add(robotRightLeg)
+    .add(leftRobotArm)
+    .add(rightRobotArm);
 
   innerGroup = new THREE.Group().add(robot);
   outerGroup = new THREE.Group().add(innerGroup);
   robotLeftLeg.position.set(0,150,-25);
   robotRightLeg.position.set(0,150,25);
-  leftRobotClaw.position.set(0, 20, 0);
-  rightRobotClaw.position.set(0,-230,0);
   leftRobotForearm.position.set(0,200,0);
-  leftRobotArm.position.set(0,0,-60);
-  rightRobotArm.position.set(0,0,60);
+  leftRobotArm.position.set(0,300,-60);
+  rightRobotArm.position.set(0,300,60);
   rightRobotForearm.position.set(0,200,0);
   robotHead.position.set(0,355,0);
-  robot.position.set(0,0,0);
+  robot.position.set(0,60,0);
 
 	scene.add(outerGroup);
 }
 
-function drawClaw() {
-	var claw = new THREE.Shape();
-	claw.moveTo(10, 10);
-	claw.bezierCurveTo(20, 35, 50, 35, 60, 10);
-	claw.bezierCurveTo(50, 20, 20, 20, 10, 10);
-	return claw;
-}
-
 function animate() {
 
-    leftRobotArm.rotation.y = (params.swivel * Math.PI / 180);
-    rightRobotArm.rotation.y = (params.swivel * Math.PI / 180);
-    leftRobotForearm.rotation.z = (params.bend * Math.PI / 180);
-    rightRobotForearm.rotation.z = (params.bend * Math.PI / 180);
-    rightUpperClaw.rotation.z = (-70 * Math.PI / 180) - (params.grab * Math.PI / 180);
-    rightLowerClaw.rotation.z = (-70 * Math.PI / 180) - (params.grab * Math.PI / 180);
-    leftUpperClaw.rotation.z = (-70 * Math.PI / 180) - (params.grab * Math.PI / 180);
-    leftLowerClaw.rotation.z = (-70 * Math.PI / 180) - (params.grab * Math.PI / 180);
+    leftRobotArm.rotation.y = (swivel * Math.PI / 180);
+    rightRobotArm.rotation.y = (swivel * Math.PI / 180);
+    leftRobotForearm.rotation.z = (bend * Math.PI / 180);
+    rightRobotForearm.rotation.z = (bend * Math.PI / 180);
 
     keyBoard.update();
 
@@ -464,6 +338,8 @@ function moveLegs(){
 	cycle += 1;
   robotLeftLeg.rotation.z = Math.cos(cycle * (Math.PI/180));
 	robotRightLeg.rotation.z = Math.cos(cycle * (Math.PI/180) + Math.PI);
+  leftRobotArm.rotation.z = Math.cos(cycle * (Math.PI/180) + Math.PI);
+	rightRobotArm.rotation.z = Math.cos(cycle * (Math.PI/180));
 }
 
 function init() {
@@ -488,7 +364,6 @@ function init() {
 function addToDOM() {
     var canvas = document.getElementById('canvas');
     canvas.appendChild(renderer.domElement);
-    canvas.appendChild(gui.domElement);
 }
 
 function render() {
@@ -500,11 +375,9 @@ function render() {
 
 try {
   init();
-  createGUI();
   fillScene();
   addToDOM();
   animate();
 } catch(error) {
-    console.log("Your program encountered an unrecoverable error, can not draw on canvas. Error was:");
     console.log(error);
 }

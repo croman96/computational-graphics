@@ -7,23 +7,17 @@
 * What is your name?
 ***********************************************************************/
 
-<Replace this with your response--remember to delete the angle brackets>
-
-
+Carlos Roman Rivera
 
 /**********************************************************************
 * What browser and operating system did you test your program with?
 ***********************************************************************/
 
-<Replace this with your response>
-
-
+Chrome - MacOS
 
 /**********************************************************************
 * Approximately how many hours did you spend working on this assignment?
 ***********************************************************************/
-
-<Replace this with your response!>
 
 
 
@@ -33,8 +27,6 @@
  * How can I make this assignment better?
  **********************************************************************/
 
-<Replace this with your response!>
-
 
 
 /**********************************************************************
@@ -43,4 +35,3 @@
  * doing the assignment, whether you enjoyed doing it, etc.
  **********************************************************************/
 
-<Replace this with your response!>
